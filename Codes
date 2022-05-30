@@ -1,0 +1,49 @@
+## Loading packages which are useful
+
+library(lattice)
+library(ggplot2)
+library(caret)
+library(kernlab)
+library(rattle)
+library(corrplot)
+set.seed(1234)
+
+##Loading data
+
+traincsv <- read.csv("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
+testcsv <- read.csv("http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
+dim(traincsv) ##browse the training data 
+dim(testcsv)  ##browse the testing data
+
+## Cleaning the Data
+
+traincsv <- traincsv[,colMeans(is.na(traincsv)) < .9] #removing na columns
+traincsv <- traincsv[,-c(1:7)] #removing metadata 
+
+## Removing near zero variance variables.
+nzv <- nearZeroVar(traincsv)
+traincsv <- traincsv[,-nvz]
+dim(traincsv)
+
+## Partioning data into 2 sets (60% for training, 40% for testing)
+train2 <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
+train3 <- train[train2, ]; train4 <- training[-train2, ]
+dim(train3); dim(train4)
+
+## Decision tree
+Detree <- rpart(classe ~ ., data=train3, method="class")
+fancyRpartPlot(modFitA1)
+
+## Prediction 
+prediction1 <- predict(modFitA1, train4, type = "class")
+
+confusionMatrix(predictionsA1, train4$classe)
+
+## Random forest
+ran1 <- randomForest(classe ~. , data=train3)
+prediction2 <- predict(modFitB1, train4, type = "class")
+confusionMatrix(predictionsB1, train4$classe)
+
+## Assignment answers
+predictions3 <- predict(prediction2, testing, type = "class")
+pml_write_files(prediction3)
